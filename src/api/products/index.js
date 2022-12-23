@@ -1,29 +1,21 @@
 import express from "express";
-import fs from "fs-extra";
-import { fileURLToPath } from "url";
-import { join, dirname } from "path";
 import uniqid from "uniqid";
+import { getProducts, writeProducts } from "../../lib/fs-tools.js";
 
 const productsRouter = express.Router();
 
-const productsJSONPath = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "../../data/products.json"
-);
-
 productsRouter.post("/", async (req, res, next) => {
   try {
-    console.log("productsJSONPath:", productsJSONPath);
     const newProduct = {
       ...req.body,
       createdAt: new Date(),
       updatedAt: new Date(),
       _id: uniqid(),
     };
-    const productsArray = await fs.readJSON(productsJSONPath);
+    const productsArray = await getProducts();
 
     productsArray.push(newProduct);
-    await fs.writeJSON(productsJSONPath, productsArray);
+    await writeProducts(productsArray);
     res.status(201).send({ _id: newProduct._id });
   } catch (error) {
     next(error);
@@ -31,12 +23,12 @@ productsRouter.post("/", async (req, res, next) => {
 });
 
 productsRouter.get("/", async (req, res) => {
-  const productsArray = await fs.readJSON(productsJSONPath);
+  const productsArray = await getProducts();
   res.send(productsArray);
 });
 
 productsRouter.get("/:productId", async (req, res) => {
-  const productsArray = await fs.readJSON(productsJSONPath);
+  const productsArray = await getProducts();
   const product = productsArray.find(
     (product) => product._id === req.params.productId
   );
@@ -45,7 +37,7 @@ productsRouter.get("/:productId", async (req, res) => {
 });
 
 productsRouter.put("/:productId", async (req, res) => {
-  const productsArray = await fs.readJSON(productsJSONPath);
+  const productsArray = await getProducts();
   const productIndex = productsArray.findIndex(
     (product) => product._id === req.params.productId
   );
@@ -55,16 +47,16 @@ productsRouter.put("/:productId", async (req, res) => {
     updatedAt: new Date(),
   };
   productsArray[productIndex] = updatedProduct;
-  fs.writeJSON(productsJSONPath, productsArray);
+  await writeProducts(productsArray);
   res.send(updatedProduct);
 });
 
 productsRouter.delete("/:productId", async (req, res) => {
-  const productsArray = await fs.readJSON(productsJSONPath);
+  const productsArray = await getProducts();
   const remainingArray = productsArray.filter(
     (product) => product._id !== req.params.productId
   );
-  await fs.writeJSON(productsJSONPath, remainingArray);
+  await writeProducts(remainingArray);
   res.status(204).send();
 });
 
