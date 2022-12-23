@@ -6,7 +6,12 @@ const dataFolderPath = join(dirname(fileURLToPath(import.meta.url)), "../data");
 
 const productsJSONPath = join(dataFolderPath, "products.json");
 
+const publicImgProductsPath = join(process.cwd(), "/public/img/products");
+
 export const getProducts = () => fs.readJSON(productsJSONPath);
 
 export const writeProducts = (productsArray) =>
   fs.writeJSON(productsJSONPath, productsArray);
+
+export const saveProductImg = (fileName, contentAsABuffer) =>
+  fs.writeFile(join(publicImgProductsPath, fileName), contentAsABuffer);

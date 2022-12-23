@@ -1,5 +1,6 @@
 import express from "express";
 import listEndpoints from "express-list-endpoints";
+import productRouter from "./api/product/index.js";
 import productsRouter from "./api/products/index.js";
 import {
   badRequestErrorHandler,
@@ -7,13 +8,19 @@ import {
   notFoundErrorHandler,
   unauthorizedErrorHandler,
 } from "./errorHandler.js";
+import { join } from "path";
 
 const server = express();
 const port = 3001;
 
+const publicFolderPath = join(process.cwd(), "./public");
+
+server.use(express.static(publicFolderPath));
+
 server.use(express.json());
 
 server.use("/products", productsRouter);
+server.use("/product", productRouter);
 
 server.use(notFoundErrorHandler);
 server.use(unauthorizedErrorHandler);
