@@ -15,3 +15,6 @@ export const writeProducts = (productsArray) =>
 
 export const saveProductImg = (fileName, contentAsABuffer) =>
   fs.writeFile(join(publicImgProductsPath, fileName), contentAsABuffer);
+
+export const deleteProductsPicture = (imageUrl) =>
+  fs.unlink(join(publicImgProductsPath, "../../", imageUrl));
